@@ -23,19 +23,15 @@ def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
     setup_db(app)
-    #CORS(app, resources={r"*/api/*" : {"origins": '*'}})
     """
     @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
     """
     # CORS Headers
     @app.after_request
     def after_request(response):
-        response.headers.add(
-            "Access-Control-Allow-Headers", "Content-Type,Authorization,true"
-        )
-        response.headers.add(
-            "Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS"
-        )
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add( "Access-Control-Allow-Headers", "Content-Type,Authorization,true")
+        response.headers.add("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS")
         return response
     """
     @TODO: Use the after_request decorator to set Access-Control-Allow
@@ -57,7 +53,7 @@ def create_app(test_config=None):
             {
                 "success": True,
                 "categories": all_categories,
-                "total_questions": len(Category.query.all())
+                "total_categories": len(Category.query.all())
             }
         )
 
@@ -76,7 +72,7 @@ def create_app(test_config=None):
                 "questions": current_questions,
                 "total_questions": len(Question.query.all()),
                 "categories":  [category.format() for category in categories],
-                "currentCategory": 1
+                "currentCategory": 'History'
             }
         )
 
@@ -121,7 +117,7 @@ def create_app(test_config=None):
                 "deleted": question_id,
                 "total_questions": len(Question.query.all()),
                 "categories":  [category.format() for category in categories],
-                "currentCategory": 1
+                "currentCategory": 'History'
             }
             )
 
@@ -169,7 +165,7 @@ def create_app(test_config=None):
                 "created": True,
                 "total_questions": len(Question.query.all()),
                 "categories":  [category.format() for category in categories],
-                "currentCategory": 1
+                "currentCategory": 'History'
             }
             )
 
@@ -203,7 +199,7 @@ def create_app(test_config=None):
                 "success": True,
                 "questions": current_questions,
                 "total_questions": len(current_questions),
-                "currentCategory": 1
+                "currentCategory": 'History'
             }
             )
 
@@ -234,7 +230,7 @@ def create_app(test_config=None):
                 "success": True,
                 "questions": current_questions,
                 "total_questions": len(Question.query.all()),
-                "currentCategory": 1
+                "currentCategory": category.type
             }
         )
 
@@ -257,10 +253,15 @@ def create_app(test_config=None):
         previous_questions = body.get("previous_questions", None)
         quiz_category = body.get("quiz_category", None)
 
+
+
         if quiz_category['type'] == 'click':
             questions = Question.query.order_by('id').all()
+            category = Category.query.filter_by(id = '1').first()
         else:
             questions = Question.query.filter(Question.category == quiz_category['type']).all()
+            category = Category.query.filter_by(id = quiz_category['type']).first()
+
 
         if questions == []:
             abort(404)
@@ -291,7 +292,7 @@ def create_app(test_config=None):
                 {
                 "success": True,
                 "question": selection,
-                "currentCategory": 1
+                "currentCategory": category.type
             }
             )
 
