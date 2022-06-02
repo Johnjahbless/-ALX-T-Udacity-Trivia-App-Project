@@ -306,7 +306,7 @@ The API will return three error types when requests fail:
   "total_questions": 17
 }
 ```
-#### DELETE /questions/{book_id}
+#### DELETE /questions/{question_id}
 - General:
     - Deletes the question of the given ID if it exists. Returns the id of the deleted question, success value, total questions, current category and questions list based on current page number to update the frontend. 
 - `curl -X DELETE http://127.0.0.1:5000/questions/16?page=2`
@@ -415,7 +415,7 @@ The API will return three error types when requests fail:
     ],
     "deleted": 16,
     "success": true,
-    "total_books": 15
+    "total_questions": 15
 }
 ```
 
