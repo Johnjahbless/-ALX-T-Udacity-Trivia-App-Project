@@ -45,7 +45,11 @@ def create_app(test_config=None):
 
     @app.route("/categories")
     def retrieve_categories():
+
+        # Query to fetch categories ordering by id
         categories = Category.query.order_by(Category.id).all()
+
+        # Format tha data so it can be sent using jsonify
         all_categories = [category.format() for category in categories]
 
 
@@ -59,10 +63,17 @@ def create_app(test_config=None):
 
     @app.route("/questions")
     def retrieve_questions():
+
+        # Query to fetch all questions ordering by id
         selection = Question.query.order_by(Question.id).all()
+
+        # Query to fetch categories ordering by id
         categories = Category.query.order_by(Category.id).all()
+
+        # Pass request and questions data as arguements for pagination and formating
         current_questions = paginate_questions(request, selection)
 
+        # If there are no questions fetch, abort the operation
         if len(current_questions) == 0:
             abort(404)
 
@@ -99,13 +110,17 @@ def create_app(test_config=None):
 
     @app.route("/questions/<int:question_id>", methods=["DELETE"])
     def delete_question(question_id):
+
         try:
+            # Get the question to delete by the question unique id
             question = Question.query.filter(Question.id == question_id).one_or_none()
 
+            # If no question is found abort the operation
             if question is None:
                 abort(404)
 
             question.delete()
+
             selection = Question.query.order_by(Question.id).all()
             categories = Category.query.order_by(Category.id).all()
             current_questions = paginate_questions(request, selection)
@@ -138,14 +153,18 @@ def create_app(test_config=None):
 
     @app.route("/questions", methods=["POST"])
     def create_question():
+        
+        # Get data from the received request
         body = request.get_json()
 
+        # Get each data from the body object
         new_question = body.get("question", None)
         new_answer = body.get("answer", None)
         new_difficulty = body.get("difficulty", None)
         new_category = body.get("category", None)
 
         try:
+            # Create a new question data to be inserted to the DB
             question = Question(
                 question = new_question, 
                 answer = new_answer, 
@@ -156,6 +175,8 @@ def create_app(test_config=None):
 
             selection = Question.query.order_by(Question.id).all()
             categories = Category.query.order_by(Category.id).all()
+
+            # Pass request and questions data as arguements for pagination and formating
             current_questions = paginate_questions(request, selection)
 
             return jsonify(
@@ -187,11 +208,15 @@ def create_app(test_config=None):
     def search_questions():
         body = request.get_json()
 
+        # Get the text to search for from the body object
         searchTerm = body.get("searchTerm", None)
 
         try:
-            selection = Question.query.filter(Question.question.ilike(f'%{searchTerm}%')).all()
 
+            # uSing the SQL LIKE keyword, fetch all questions that has that search term
+            selection = Question.query.filter(Question.question.ilike(f'%{searchTerm}%')).all()
+        
+            # Pass request and questions data as arguements for pagination and formating
             current_questions = paginate_questions(request, selection)
 
             return jsonify(
@@ -216,12 +241,18 @@ def create_app(test_config=None):
     """
     @app.route("/categories/<string:category_id>/questions")
     def retrieve_questions_category(category_id):
+
+        # Get the category data by the category id
         category = Category.query.filter_by(id = category_id).one_or_none()
 
+        # If no category is found abort the operation
         if category is None:
             abort(422)
 
+        # Fetch all questions by the category id, ordering all records by question id
         selection = Question.query.filter(Question.category == category_id).order_by(Question.id).all()
+
+        # Pass request and questions data as arguements for pagination and formating
         current_questions = paginate_questions(request, selection)
 
 
@@ -250,19 +281,21 @@ def create_app(test_config=None):
     def get_question():
         body = request.get_json()
 
+        # Get received data from the body object
         previous_questions = body.get("previous_questions", None)
         quiz_category = body.get("quiz_category", None)
 
 
-
+        # Check if the all text was clicked to fetch all questions
         if quiz_category['type'] == 'click':
             questions = Question.query.order_by('id').all()
             category = Category.query.filter_by(id = '1').first()
         else:
+            # Fetch all questions by the category id
             questions = Question.query.filter(Question.category == quiz_category['type']).all()
             category = Category.query.filter_by(id = quiz_category['type']).first()
 
-
+        # if the list is empty abort the operation
         if questions == []:
             abort(404)
 
@@ -270,18 +303,20 @@ def create_app(test_config=None):
 
             filter_questions = []
 
-
+            # If the previous_question list is empty, no need to filter the questions from the previous questions
             if len(previous_questions) == 0:
                 filter_questions = questions
 
+            # If the prevoius_question list is not empty loop through the questions data to remove each of them
             for p in previous_questions:
                 filter_questions = filter(lambda a: a.id != p, questions)
                 questions = list(filter_questions)
                 
 
-            
+            # # Format tha rest of the question data so it can be sent using jsonify
             selection = [question.format() for question in questions]
 
+            # If the question data is not empty, randomly select one question from the list
             if len(selection) != 0: 
                 random_selection = random.randrange(len(selection))
                 selection = selection[random_selection]
