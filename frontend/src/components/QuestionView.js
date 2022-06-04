@@ -147,7 +147,7 @@ class QuestionView extends Component {
                   this.getByCategory(category.id);
                 }}
               > 
-                {category.id}
+                {category.type}
                 <img
                   className='category'
                   alt={`${category.type}`}
