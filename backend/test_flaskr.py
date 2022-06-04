@@ -78,9 +78,20 @@ class TriviaTestCase(unittest.TestCase):
         questions = Question.query.filter(Question.category == '1000').all()
 
 
-        self.assertEqual(res.status_code, 404)
+        self.assertEqual(res.status_code, 400)
         self.assertEqual(data["success"], False)
-        self.assertEqual(data["message"], "resource not found")
+        self.assertEqual(data["message"], "bad request")
+
+
+    def test_get_questions_with_invalid_parameters(self):
+        res = self.client().post("/quizzes", json={"quiz_category": {'name': 'science'}})
+        data = json.loads(res.data)
+        questions = Question.query.filter(Question.category == 'science').all()
+
+
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["message"], "bad request")
 
 
     def test_422_if_category_does_not_exist(self):
