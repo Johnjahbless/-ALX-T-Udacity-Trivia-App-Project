@@ -72,7 +72,7 @@ class QuestionView extends Component {
         this.setState({
           questions: result.questions,
           total_questions: result.total_questions,
-          currentCategory: result.current_category,
+          currentCategory: result.currentCategory,
         });
         return;
       },
@@ -165,7 +165,7 @@ class QuestionView extends Component {
               key={q.id}
               question={q.question}
               answer={q.answer}
-              category={this.state.categories[q.category]}
+              category={this.state.categories[q.category - 1]}
               difficulty={q.difficulty}
               questionAction={this.questionAction(q.id)}
             />
