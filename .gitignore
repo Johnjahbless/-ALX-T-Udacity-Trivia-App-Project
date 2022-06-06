@@ -1,8 +1,6 @@
 .vscode
 __pycache__
 venv
-env
-.env
 
 # OS generated files #
 ######################
@@ -11,8 +9,7 @@ env
 ._*
 .Spotlight-V100
 .Trashes
-backend/.env
-backend/env
 ehthumbs.db
 Thumbs.db
+env/
 frontend/node_modules/
