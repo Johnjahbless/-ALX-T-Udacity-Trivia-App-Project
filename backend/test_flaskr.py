@@ -14,8 +14,8 @@ class TriviaTestCase(unittest.TestCase):
         """Define test variables and initialize app."""
         self.app = create_app()
         self.client = self.app.test_client
-        self.database_name = "trivia_test"
-        self.database_path = "postgresql://{}:{}@{}/{}".format("postgres", "56560000", "localhost:5432", self.database_name)
+        self.database_name = os.getenv('DB_NAME_TEST')
+        self.database_path = "postgresql://{}:{}@{}/{}".format(os.getenv('DB_USERNAME'), os.getenv('DB_PASSWORD'), os.getenv('DB_SERVER'), self.database_name)
         setup_db(self.app, self.database_path)
 
         self.new_question = {'question': 'What is my surname?', 'answer': 'kolo', 'category': '3', 'difficulty': 1}
@@ -86,7 +86,7 @@ class TriviaTestCase(unittest.TestCase):
     def test_get_questions_with_invalid_parameters(self):
         res = self.client().post("/quizzes", json={"quiz_category": {'name': 'science'}})
         data = json.loads(res.data)
-        questions = Question.query.filter(Question.category == 'science').all()
+        questions = Question.query.filter(Question.category == '1').all()
 
 
         self.assertEqual(res.status_code, 400)
